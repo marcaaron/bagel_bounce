@@ -39,37 +39,31 @@ export default class Canvas extends Component {
     function update() {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       bagel.draw();
-      bagel.x += bagel.dx
-      bagel.y += bagel.vy;
-      bagel.vy += gravity;
-      if (bagel.selected & !bagel.drag) {
-        //if bagel is staticly touched, stay there
-        bagel.x = bagel.selectedX;
-        bagel.y = bagel.selectedY;
-      }
-      // if (bagel.drag) {
-      //   //if it is dragged, move it accordingly
-      //   bagel.x += bagel.dragX;
-      //   bagel.y += bagel.dragY;
-      // }
-      if (bagel.y + bagel.size > canvas.height + buffer) {
-        //if it hits the floor, bounce
-        bagel.y = (canvas.height + buffer) - bagel.size;
-        bagel.vy *= -bounce;
-        if (Math.abs(bagel.vy) < .8) {
-          //if it also has low velocity, slow to stop
-          bagel.dx *= bounce;
-          bagel.dy *= bounce;
-          bagel.vy = 0;
+
+      if (!bagel.drag && !bagel.selected){
+        bagel.x += bagel.dx
+        bagel.y += bagel.vy;
+        bagel.vy += gravity;
+        if (bagel.y + bagel.size > canvas.height + buffer) {
+          //if it hits the floor, bounce
+          bagel.y = (canvas.height + buffer) - bagel.size;
+          bagel.vy *= -bounce;
+          if (Math.abs(bagel.vy) < .8) {
+            //if it also has low velocity, slow to stop
+            bagel.dx *= bounce;
+            bagel.dy *= bounce;
+            bagel.vy = 0;
+          }
         }
-      }
-      if (bagel.y + bagel.dy <= -buffer) {
-        //if it hits the top, reverse
-        bagel.dy = -bagel.dy;
-      }
-      if (bagel.x + bagel.dx <= -buffer || bagel.x + bagel.dx > canvas.width - bagel.size + buffer) {
-        //if it hits either side, reverse
-        bagel.dx = -bagel.dx;
+        if (bagel.y + bagel.dy <= -buffer) {
+          //if it hits the top, reverse
+          bagel.dy = -bagel.dy;
+        }
+        if (bagel.x + bagel.dx <= -buffer || bagel.x + bagel.dx > canvas.width - bagel.size + buffer) {
+          //if it hits either side, reverse
+          bagel.dx = -bagel.dx;
+        }
+
       }
     };
     //event listeners
@@ -83,8 +77,8 @@ export default class Canvas extends Component {
         if (touchX > x && touchX < x1 && touchY > y && touchY < y1) {
           //if bagel is touched, log the coordinates
           bagel.selected = true;
-          bagel.selectedX = x;
-          bagel.selectedY = y;
+          bagel.x = x;
+          bagel.y = y;
         }
       }
     };
@@ -101,24 +95,22 @@ export default class Canvas extends Component {
           bagel.touchY = null
       }
     };
-    // function handleTouchMove(e, x, y) {
-    //   // e.preventDefault();
-    //   if (bagel.selected) {
-    //     bagel.drag = true;
-    //     let touchX = e.targetTouches[0].pageX;
-    //     let touchY = e.targetTouches[0].pageY;
-    //     bagel.dragX = bagel.touchX ? bagel.dragX - touchX : 0;
-    //     bagel.dragY += bagel.touchY ? bagel.dragY - touchY : 0;
-    //     bagel.touchX = e.targetTouches[0].pageX;
-    //     bagel.touchY = e.targetTouches[0].pageY;
-    //   }
-    // };
+    function handleTouchMove(e) {
+      e.preventDefault();
+      if (bagel.selected) {
+        bagel.drag = true;
+        let touchX = e.targetTouches[0].pageX;
+        let touchY = e.targetTouches[0].pageY;
+        bagel.x = touchX - bagel.radius;
+        bagel.y = touchY - bagel.radius;
+      }
+    };
     canvas.addEventListener('touchstart', (e) => {
       handleTouchStart(e, bagel.x, bagel.y, bagel.size)
     });
-    // canvas.addEventListener('touchmove', (e) => {
-    //   handleTouchMove(e, bagel.x, bagel.y, bagel.size)
-    // });
+    canvas.addEventListener('touchmove', (e) => {
+      handleTouchMove(e)
+    });
     canvas.addEventListener('touchend', handleTouchEnd);
     //run update function continuously
     setInterval(update, 1000 / 60);
