@@ -9606,7 +9606,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactDom = __webpack_require__(98);
 
-var _Canvas = __webpack_require__(186);
+var _Canvas = __webpack_require__(184);
 
 var _Canvas2 = _interopRequireDefault(_Canvas);
 
@@ -22138,9 +22138,7 @@ module.exports = ReactDOMInvalidARIAHook;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 184 */,
-/* 185 */,
-/* 186 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22164,8 +22162,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// import bagel from '/images/bagel.png'
-
 var Canvas = function (_Component) {
   _inherits(Canvas, _Component);
 
@@ -22175,53 +22171,97 @@ var Canvas = function (_Component) {
     var _this = _possibleConstructorReturn(this, (Canvas.__proto__ || Object.getPrototypeOf(Canvas)).call(this, props));
 
     _this.state = {};
+    _this.handleTouch = _this.handleTouch.bind(_this);
     return _this;
   }
 
   _createClass(Canvas, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      // const canvas = document.getElementById('canvas')
+      // const ctx = canvas.getContext('2d')
+      // canvas.width = window.innerWidth;
+      // canvas.height = window.innerHeight;
+      // let bagel = {
+      //   size: 250,
+      //   radius: 125,
+      //   x: (canvas.width/2)-125,
+      //   y: (canvas.height/2)-125,
+      //   dx: 2,
+      //   dy: -2,
+      //   draw: function(){
+      //     let img = new Image();
+      //     img.src = '/images/bagel.png'
+      //     ctx.drawImage(img, this.x, this.y, 250, 250)
+      //   }
+      // }
+      // function draw() {
+      //   ctx.clearRect(0, 0, canvas.width, canvas.height);
+      //   bagel.draw();
+      //   bagel.x += bagel.dx;
+      //   bagel.y += bagel.dy;
+      //   if (bagel.y + bagel.dy < -10 || bagel.y + bagel.dy > window.innerHeight - bagel.size + 10) {
+      //     bagel.dy = -bagel.dy;
+      //   }
+      //   if (bagel.x + bagel.dx > window.innerWidth - bagel.size + 10 || bagel.x + bagel.dx < -10) {
+      //     bagel.dx = -bagel.dx;
+      //   }
+      // }
+      // setInterval(draw, 10);
+      ///////////
       var canvas = document.getElementById('canvas');
       var ctx = canvas.getContext('2d');
-      var x = window.innerWidth / 2 - 125;
-      var y = window.innerHeight / 2 - 125;
-      var dx = 2;
-      var dy = -2;
-      var size = 250;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       var gravity = 0.2;
       var bounce = 0.7;
-      var vx = 0;
-      var vy = 1;
-      function drawBagel() {
-        var bagel = new Image();
-        bagel.src = '/images/bagel.png';
-        ctx.drawImage(bagel, x, y, size, size);
-      }
-      function draw() {
-        ctx.canvas.width = window.innerWidth;
-        ctx.canvas.height = window.innerHeight;
+      var bagel = {
+        size: 250,
+        radius: 125,
+        x: canvas.width / 2 - 125,
+        y: canvas.height / 2 - 125,
+        vx: 0,
+        vy: 1,
+        draw: function draw() {
+          var img = new Image();
+          img.src = '/images/bagel.png';
+          ctx.drawImage(img, this.x, this.y, this.size, this.size);
+        }
+      };
+      function clear() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBagel();
-        x += dx;
-        y += dy;
-        if (y + dy < -10 || y + dy > canvas.height - size + 10) {
-          dy = -dy;
-        }
-        if (x + dx > canvas.width - size + 10 || x + dx < -10) {
-          dx = -dx;
+      }
+      function update() {
+        clear();
+        bagel.draw();
+        bagel.y += bagel.vy;
+        bagel.vy += gravity;
+        if (bagel.y + bagel.size > canvas.height + 10) {
+          bagel.y = canvas.height + 10 - bagel.size;
+          bagel.vy *= -bounce;
         }
       }
-      setInterval(draw, 10);
+      canvas.addEventListener('touchstart', this.handleTouch);
+
+      setInterval(update, 1000 / 60);
+    }
+  }, {
+    key: 'handleTouch',
+    value: function handleTouch(e) {
+      if (e && e.touches.length === 1) {
+        var touch = e.touches[0];
+        var touchX = touch.pageX;
+        var touchY = touch.pageY;
+        // touchX=touch.pageX-touch.target.offsetLeft;
+        // touchY=touch.pageY-touch.target.offsetTop;
+        console.log(touchX, touchY);
+        // }
+      }
     }
   }, {
     key: 'render',
     value: function render() {
-      console.log('i rendered');
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement('canvas', { id: 'canvas' })
-      );
+      return _react2.default.createElement('canvas', { id: 'canvas' });
     }
   }]);
 
