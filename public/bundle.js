@@ -22220,6 +22220,8 @@ var Canvas = function (_Component) {
         radius: 125,
         x: canvas.width / 2 - 125,
         y: canvas.height / 2 - 125,
+        dx: 2,
+        dy: -2,
         vx: 0,
         vy: 1,
         draw: function draw() {
@@ -22234,11 +22236,18 @@ var Canvas = function (_Component) {
       function update() {
         clear();
         bagel.draw();
-        bagel.y += bagel.vy;
+        bagel.x += bagel.dx;
+        bagel.y += bagel.vy + bagel.dy;
         bagel.vy += gravity;
         if (bagel.y + bagel.size > canvas.height + 10) {
           bagel.y = canvas.height + 10 - bagel.size;
           bagel.vy *= -bounce;
+        }
+        if (bagel.y + bagel.dy < -10 || bagel.y + bagel.dy > window.innerHeight - bagel.size + 10) {
+          bagel.dy = -bagel.dy;
+        }
+        if (bagel.x + bagel.dx > window.innerWidth - bagel.size + 10 || bagel.x + bagel.dx < -10) {
+          bagel.dx = -bagel.dx;
         }
       }
       canvas.addEventListener('touchstart', this.handleTouch);
