@@ -22178,6 +22178,8 @@ var Canvas = function (_Component) {
   _createClass(Canvas, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       // const canvas = document.getElementById('canvas')
       // const ctx = canvas.getContext('2d')
       // canvas.width = window.innerWidth;
@@ -22239,36 +22241,41 @@ var Canvas = function (_Component) {
         bagel.y += bagel.vy;
         bagel.vy += gravity;
         if (bagel.y + bagel.size > canvas.height + 10) {
-          //if the bagel hits the bottom edge, bounce
+          //if the bagel hits the floor, bounce
           bagel.y = canvas.height + 10 - bagel.size;
           bagel.vy *= -bounce;
-          //if it's on the floor with low velocity, slow to stop
           if (Math.abs(bagel.vy) < .8) {
+            //if it also has low velocity, slow to stop
             bagel.dx *= bounce;
-            bagel.vy = 0;
-            bagel.dy = 0;
+            bagel.dy *= bounce;
           }
         }
         if (bagel.y + bagel.dy <= -10) {
-          //if it hits the top edge, reverse
+          //if it hits the top, reverse
           bagel.dy = -bagel.dy;
         }
         if (bagel.x + bagel.dx <= -10 || bagel.x + bagel.dx > canvas.width - bagel.size + 10) {
-          //if it hits either side edge, reverse
+          //if it hits either side, reverse
           bagel.dx = -bagel.dx;
         }
       }
-      canvas.addEventListener('touchstart', this.handleTouch);
-
+      canvas.addEventListener('touchstart', function (e) {
+        _this2.handleTouch(e, bagel.x, bagel.y, bagel.size);
+      });
       setInterval(update, 1000 / 60);
     }
   }, {
     key: 'handleTouch',
-    value: function handleTouch(e) {
+    value: function handleTouch(e, x, y, size) {
       if (e && e.touches.length === 1) {
         var touchX = e.touches[0].pageX;
         var touchY = e.touches[0].pageY;
-        console.log(touchX, touchY);
+        var x1 = x + size;
+        var y1 = y + size;
+        if (touchX > x && touchX < x1 && touchY > y && touchY < y1) {
+          // if the bagel was touched
+          console.log('touched it');
+        }
       }
     }
   }, {
