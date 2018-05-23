@@ -52,7 +52,6 @@ export default class Canvas extends Component {
       y: (canvas.height / 2) - 125,
       dx: 2,
       dy: -2,
-      vx: 0,
       vy: 1,
       draw: function () {
         let img = new Image();
@@ -67,16 +66,25 @@ export default class Canvas extends Component {
       clear();
       bagel.draw();
       bagel.x += bagel.dx
-      bagel.y += (bagel.vy + bagel.dy);
+      bagel.y += bagel.vy;
       bagel.vy += gravity;
       if (bagel.y + bagel.size > (canvas.height + 10)) {
+        //if the bagel hits the bottom edge, bounce
         bagel.y = (canvas.height + 10) - bagel.size;
         bagel.vy *= -bounce;
+        //if it's on the floor with low velocity, slow to stop
+        if (Math.abs(bagel.vy) < .8) {
+          bagel.dx *= bounce;
+          bagel.vy = 0
+          bagel.dy = 0
+        }
       }
-      if (bagel.y + bagel.dy < -10 || bagel.y + bagel.dy > window.innerHeight - bagel.size + 10) {
+      if (bagel.y + bagel.dy <= -10 ) {
+        //if it hits the top edge, reverse
         bagel.dy = -bagel.dy;
       }
-      if (bagel.x + bagel.dx > window.innerWidth - bagel.size + 10 || bagel.x + bagel.dx < -10) {
+      if (bagel.x + bagel.dx <= -10 || bagel.x + bagel.dx > canvas.width - bagel.size + 10) {
+        //if it hits either side edge, reverse
         bagel.dx = -bagel.dx;
       }
     }
@@ -87,13 +95,9 @@ export default class Canvas extends Component {
 
   handleTouch(e) {
     if (e && e.touches.length === 1) {
-      let touch = e.touches[0];
-      let touchX = touch.pageX;
-      let touchY = touch.pageY;
-      // touchX=touch.pageX-touch.target.offsetLeft;
-      // touchY=touch.pageY-touch.target.offsetTop;
+      let touchX = e.touches[0].pageX;
+      let touchY = e.touches[0].pageY;
       console.log(touchX, touchY)
-      // }
     }
   }
 

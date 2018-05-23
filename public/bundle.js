@@ -22222,7 +22222,6 @@ var Canvas = function (_Component) {
         y: canvas.height / 2 - 125,
         dx: 2,
         dy: -2,
-        vx: 0,
         vy: 1,
         draw: function draw() {
           var img = new Image();
@@ -22237,16 +22236,25 @@ var Canvas = function (_Component) {
         clear();
         bagel.draw();
         bagel.x += bagel.dx;
-        bagel.y += bagel.vy + bagel.dy;
+        bagel.y += bagel.vy;
         bagel.vy += gravity;
         if (bagel.y + bagel.size > canvas.height + 10) {
+          //if the bagel hits the bottom edge, bounce
           bagel.y = canvas.height + 10 - bagel.size;
           bagel.vy *= -bounce;
+          //if it's on the floor with low velocity, slow to stop
+          if (Math.abs(bagel.vy) < .8) {
+            bagel.dx *= bounce;
+            bagel.vy = 0;
+            bagel.dy = 0;
+          }
         }
-        if (bagel.y + bagel.dy < -10 || bagel.y + bagel.dy > window.innerHeight - bagel.size + 10) {
+        if (bagel.y + bagel.dy <= -10) {
+          //if it hits the top edge, reverse
           bagel.dy = -bagel.dy;
         }
-        if (bagel.x + bagel.dx > window.innerWidth - bagel.size + 10 || bagel.x + bagel.dx < -10) {
+        if (bagel.x + bagel.dx <= -10 || bagel.x + bagel.dx > canvas.width - bagel.size + 10) {
+          //if it hits either side edge, reverse
           bagel.dx = -bagel.dx;
         }
       }
@@ -22258,13 +22266,9 @@ var Canvas = function (_Component) {
     key: 'handleTouch',
     value: function handleTouch(e) {
       if (e && e.touches.length === 1) {
-        var touch = e.touches[0];
-        var touchX = touch.pageX;
-        var touchY = touch.pageY;
-        // touchX=touch.pageX-touch.target.offsetLeft;
-        // touchY=touch.pageY-touch.target.offsetTop;
+        var touchX = e.touches[0].pageX;
+        var touchY = e.touches[0].pageY;
         console.log(touchX, touchY);
-        // }
       }
     }
   }, {
